@@ -1,0 +1,20 @@
+{
+    "name": "cartrabbit/taxonomies",
+    "description": "Simple, nestable Terms & Taxonomies (similar to WordPress) for Cartrabbit.",
+    "license": "MIT",
+    "require": {
+        "php"                 : ">=5.6.4",
+        "doctrine/dbal"       : "2.5.x",
+        "illuminate/support"  : ">=5.3",
+        "illuminate/database" : ">=5.3",
+        "cviebrock/eloquent-sluggable" : "^4.1.0"
+    },
+    "require-dev": {
+        "mockery/mockery" : "0.9.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Cartrabbit\\Taxonomies\\" : "src/"
+        }
+    }
+}
