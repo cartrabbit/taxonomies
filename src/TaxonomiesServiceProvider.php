@@ -26,7 +26,7 @@ class TaxonomiesServiceProvider extends ServiceProvider
      */
 	public function register()
 	{
-	//  $this->app->singleton(Taxonomies::class);
+//	    $this->app->singleton(Taxonomies::class);
 	}
 
 	/**
@@ -44,11 +44,28 @@ class TaxonomiesServiceProvider extends ServiceProvider
      */
     private function handleConfig()
     {
-        $configPath = __DIR__ . '/../config/config.php';
+//        $configPath = __DIR__ . '/../config/config.php';
+//        $configPath = '/var/www/cartrabbit_framework/administrator/components/com_joomlarabbit/cartrabbit.config.php';
+//       echo "<pre>";print_r($this->app);exit;
+//        $this->publishes([$configPath => config_path('lecturize.php')]);
+//        $this->publishes([$configPath => '/var/www/cartrabbit_framework/administrator/components/com_joomlarabbit/cartrabbit.config.php']);
 
-        $this->publishes([$configPath => config_path('lecturize.php')]);
+//        $this->mergeConfigFrom($configPath, 'cartrabbit');
 
-        $this->mergeConfigFrom($configPath, 'lecturize');
+        app('config')->taxonomies([
+            /*
+             * Terms table
+             */
+            'table_terms' => 'terms',
+            /*
+             * Taxonomies table
+             */
+            'table_taxonomies' => 'taxonomies',
+            /*
+             * Relationship table
+             */
+            'table_pivot' => 'taxables',
+        ]);
     }
 
     /**
@@ -62,10 +79,10 @@ class TaxonomiesServiceProvider extends ServiceProvider
             if ( ! class_exists($class) ) {
                 $timestamp = date('Y_m_d_His', time());
 
-                $this->publishes([
-                    __DIR__ .'/../database/migrations/'. $file .'.php.stub' =>
-                        database_path('migrations/'. $timestamp .'_'. $file .'.php')
-                ], 'migrations');
+//                $this->publishes([
+//                    __DIR__ .'/../database/migrations/'. $file .'.php.stub' =>
+//                        database_path('migrations/'. $timestamp .'_'. $file .'.php')
+//                ], 'migrations');
             }
         }
     }

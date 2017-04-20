@@ -2,7 +2,7 @@
 
 use Cartrabbit\Taxonomies\Models\Taxonomy;
 use Cartrabbit\Taxonomies\Models\Term;
-
+use \Cviebrock\EloquentSluggable\Services\SlugService;
 class TaxableUtils
 {
     /**
@@ -24,6 +24,7 @@ class TaxableUtils
      */
     public static function createTerms(array $terms )
 	{
+
 		if ( count($terms) === 0 )
 			return;
 
@@ -33,7 +34,9 @@ class TaxableUtils
 			$found = array();
 
 		foreach ( array_diff( $terms, $found ) as $term ) {
-			Term::firstOrCreate([ 'name' => $term ]);
+			$slug = SlugService::createSlug(Term::class, 'slug', $term);
+			Term::firstOrCreate([ 'name' => $term, 'slug' => $slug ]);
+//			Term::firstOrCreate([ 'name' => $term ]);
 		}
 	}
 
