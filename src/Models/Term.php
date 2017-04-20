@@ -1,7 +1,6 @@
-<?php namespace Cartrabbit\Taxonomies\Models;
+<?php namespace Cartrabbitgit\Taxonomies\Models;
 
-use Cviebrock\EloquentSluggable\Sluggable;
-
+use Cartrabbit\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 

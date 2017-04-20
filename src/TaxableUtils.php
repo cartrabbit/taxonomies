@@ -2,7 +2,7 @@
 
 use Cartrabbit\Taxonomies\Models\Taxonomy;
 use Cartrabbit\Taxonomies\Models\Term;
-use \Cviebrock\EloquentSluggable\Services\SlugService;
+use Cartrabbit\EloquentSluggable\Services\SlugService;
 class TaxableUtils
 {
     /**
