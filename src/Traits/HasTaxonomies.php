@@ -3,6 +3,7 @@
 use Cartrabbit\Taxonomies\Models\Taxable;
 use Cartrabbit\Taxonomies\Models\Taxonomy;
 use Cartrabbit\Taxonomies\Models\Term;
+use Cartrabbit\Taxonomies\Models\TermMeta;
 use Cartrabbit\Taxonomies\TaxableUtils;
 
 /**
@@ -36,18 +37,18 @@ trait HasTaxonomies
 	 */
 	public function addTerm( $terms, $taxonomy, $parent = 0, $order = 0 )
 	{
+
 		$terms = TaxableUtils::makeTermsArray($terms);
 
 		$this->createTaxables($terms, $taxonomy, $parent, $order );
 
 		$terms = Term::whereIn('name', $terms)->pluck('id')->all();
-
 		if ( count($terms) > 0 ) {
 			foreach ( $terms as $term )
 			{
-				if ( $this->taxonomies()->where('taxonomy', $taxonomy)->where('term_id', $term)->first() )
-					continue;
-
+				if ( $this->taxonomies()->where('taxonomy', $taxonomy)->where('term_id', $term)->first() ){
+                    continue;
+                }
 				$tax = Taxonomy::where('term_id', $term)->first();
 				$this->taxonomies()->attach($tax->id);
 			}
@@ -131,7 +132,7 @@ trait HasTaxonomies
 
 		return Term::whereIn('id', $term_ids)->where('name', '=', $term)->first();
 	}
-
+    
 	/**
 	 * @param $term
 	 * @param string $taxonomy
@@ -152,11 +153,14 @@ trait HasTaxonomies
 		if ( $term = $this->getTerm($term, $taxonomy) ) {
 			if ( $taxonomy ) {
 				$taxonomy = $this->taxonomies->where('taxonomy', $taxonomy)->where('term_id', $term->id)->first();
+				$taxonomy_id = $taxonomy->id;
+                $taxonomy->forceDelete();
 			} else {
 				$taxonomy = $this->taxonomies->where('term_id', $term->id)->first();
+                $taxonomy_id = $taxonomy->id;
 			}
-
-			return $this->taxed()->where('taxonomy_id', $taxonomy->id)->delete();
+            $term->forceDelete();
+			return $this->taxed()->where('taxonomy_id', $taxonomy_id)->delete();
 		}
 
 		return null;

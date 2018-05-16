@@ -1,4 +1,4 @@
-<?php namespace Cartrabbitgit\Taxonomies\Models;
+<?php namespace Cartrabbit\Taxonomies\Models;
 
 use Cartrabbit\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Model;
@@ -61,6 +61,11 @@ class Term extends Model
 	public function taxonomies() {
 		return $this->hasMany(Taxonomy::class);
 	}
+
+    public function meta()
+    {
+        return $this->hasMany(TermMeta::class, 'term_id');
+    }
 
 	/**
 	 * Get display name.

@@ -44,10 +44,10 @@ class Taxonomy extends Model
      * An example for a related posts model
 	 * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
 	 */
-	public function posts()
+	/*public function posts()
 	{
 		return $this->morphedByMany('App\Models\Posts\Post', 'taxable', 'taxables');
-	}
+	}*/
 
 	/**
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
