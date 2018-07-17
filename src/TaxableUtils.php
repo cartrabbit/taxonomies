@@ -3,8 +3,6 @@
 use Cartrabbit\Taxonomies\Models\Taxonomy;
 use Cartrabbit\Taxonomies\Models\Term;
 use Cartrabbit\EloquentSluggable\Services\SlugService;
-use Cartrabbit\Taxonomies\Models\TermMeta;
-
 class TaxableUtils
 {
     /**

@@ -25,6 +25,9 @@ class Term extends Model
 	protected $fillable = [
 		'name',
 		'slug',
+        'desc',
+        'access',
+        'geozone_id'
 	];
 
 	/**

@@ -3,7 +3,6 @@
 use Cartrabbit\Taxonomies\Models\Taxable;
 use Cartrabbit\Taxonomies\Models\Taxonomy;
 use Cartrabbit\Taxonomies\Models\Term;
-use Cartrabbit\Taxonomies\Models\TermMeta;
 use Cartrabbit\Taxonomies\TaxableUtils;
 
 /**
@@ -132,7 +131,7 @@ trait HasTaxonomies
 
 		return Term::whereIn('id', $term_ids)->where('name', '=', $term)->first();
 	}
-    
+
 	/**
 	 * @param $term
 	 * @param string $taxonomy

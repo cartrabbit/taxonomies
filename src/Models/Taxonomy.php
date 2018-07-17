@@ -40,14 +40,6 @@ class Taxonomy extends Model
 		return $this->belongsTo(Term::class);
 	}
 
-	/**
-     * An example for a related posts model
-	 * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
-	 */
-	/*public function posts()
-	{
-		return $this->morphedByMany('App\Models\Posts\Post', 'taxable', 'taxables');
-	}*/
 
 	/**
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
