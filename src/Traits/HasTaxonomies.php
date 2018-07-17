@@ -4,6 +4,8 @@ use Cartrabbit\Taxonomies\Models\Taxable;
 use Cartrabbit\Taxonomies\Models\Taxonomy;
 use Cartrabbit\Taxonomies\Models\Term;
 use Cartrabbit\Taxonomies\TaxableUtils;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 
 /**
  * Class HasTaxonomies
@@ -112,9 +114,30 @@ trait HasTaxonomies
 		} else {
 			$term_ids = $this->getTaxonomies('term_id');
 		}
-
-		return Term::whereIn('id', $term_ids)->get();
+        return Term::whereIn('id', $term_ids)->get();
 	}
+
+	public function getTermsItems($taxonomy = '',$limit=20){
+        if ($taxonomy) {
+            $term_ids = $this->taxonomies->where('taxonomy', $taxonomy)->pluck('term_id');
+        } else {
+            $term_ids = $this->getTaxonomies('term_id');
+        }
+        $request = Request::capture();
+        $post = $request->all();
+        $page = 1;
+        $actual_link = $_SERVER['SCRIPT_URI'];
+        $term = Term::whereIn('id', $term_ids);
+        //search
+        if(isset($post['search']) && !empty($post['search'])){
+            // elquent handle query injection in 'where' clause
+            $term = $term->where('name','LIKE','%'.$post['search'].'%');
+        }
+        if(isset($post['page']) && !empty($post['page'])){
+            $page = $post['page'];
+        }
+        return $term->paginate($limit,$columns = ['*'], $pageName = 'page', $page )->setPath($actual_link)->appends($post);
+    }
 
 	/**
 	 * @param  $term
@@ -131,6 +154,20 @@ trait HasTaxonomies
 
 		return Term::whereIn('id', $term_ids)->where('name', '=', $term)->first();
 	}
+
+    /**
+     * @param  $term
+     * @param  string  $taxonomy
+     * @return mixed
+     */
+	public function getTermBySlug($slug, $taxonomy = ''){
+        if ($taxonomy) {
+            $term_ids = $this->taxonomies->where('taxonomy', $taxonomy)->pluck('term_id');
+        } else {
+            $term_ids = $this->getTaxonomies('term_id');
+        }
+        return Term::whereIn('id', $term_ids)->where('slug', '=', $slug)->first();
+    }
 
 	/**
 	 * @param $term
