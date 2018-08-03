@@ -1,5 +1,6 @@
 <?php namespace Cartrabbit\Taxonomies\Traits;
 
+use Cartrabbit\EloquentSluggable\Services\SlugService;
 use Cartrabbit\Taxonomies\Models\Taxable;
 use Cartrabbit\Taxonomies\Models\Taxonomy;
 use Cartrabbit\Taxonomies\Models\Term;
@@ -155,20 +156,6 @@ trait HasTaxonomies
 		return Term::whereIn('id', $term_ids)->where('name', '=', $term)->first();
 	}
 
-    /**
-     * @param  $term
-     * @param  string  $taxonomy
-     * @return mixed
-     */
-	public function getTermBySlug($slug, $taxonomy = ''){
-        if ($taxonomy) {
-            $term_ids = $this->taxonomies->where('taxonomy', $taxonomy)->pluck('term_id');
-        } else {
-            $term_ids = $this->getTaxonomies('term_id');
-        }
-        return Term::whereIn('id', $term_ids)->where('slug', '=', $slug)->first();
-    }
-
 	/**
 	 * @param $term
 	 * @param string $taxonomy
@@ -195,6 +182,7 @@ trait HasTaxonomies
 				$taxonomy = $this->taxonomies->where('term_id', $term->id)->first();
                 $taxonomy_id = $taxonomy->id;
 			}
+			
             $term->forceDelete();
 			return $this->taxed()->where('taxonomy_id', $taxonomy_id)->delete();
 		}
@@ -277,4 +265,137 @@ trait HasTaxonomies
 			$q->where('taxonomy_id', $taxonomy_id);
 		});
 	}
+
+    /**
+     * @param int $term_id
+     * @param string $taxonomy
+     * @return mixed
+     */
+    public function getTermChildrens($term_id = 0, $taxonomy = '')
+    {
+        if ($taxonomy) {
+            $term_ids = $this->taxonomies->where('taxonomy', $taxonomy)->where('parent', $term_id)->pluck('term_id');
+        } else {
+            $term_ids = $this->taxonomies->where('parent', $term_id)->pluck('term_id');
+        }
+
+        return Term::whereIn('id', $term_ids)->get();
+    }
+
+    /**
+     * @param $slug
+     * @param string $taxonomy
+     * @param array $options
+     * @return bool
+     */
+    public function updateTerm($id, $taxonomy = '', $options = array())
+    {
+        // load term
+        // check option have parent and update taxonomy
+        // update term
+        if ($taxonomy) {
+            $term_ids = $this->taxonomies->where('taxonomy', $taxonomy)->pluck('term_id');
+        } else {
+            $term_ids = $this->getTaxonomies('term_id');
+        }
+        $terms = Term::whereIn('id', $term_ids)->where('id', '=', $id)->first();
+        if (count($terms) > 0) {
+            if (isset($options['parent'])) {
+                Taxonomy::where('term_id', $terms->id)->update(array('parent' => $options['parent']));
+            }
+            if(isset($options['slug']) && $options['slug'] && $terms->slug != $options['slug']){
+                // chk slug is unique
+                $options['slug'] = SlugService::createSlug(Term::class, 'slug', $options['slug']);
+            }
+            $terms->fill($options);
+            $terms->save();
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+
+    public function addSingleTerm($term, $taxonomy, $parent = 0, $order = 0, $options = array()){
+        if(empty($taxonomy)){
+            return '';
+        }
+
+        if(!empty($term)){
+            if(array_key_exists('slug',$options)){
+                $found = Term::where('name', $term)->where('slug',$options['slug'])->pluck('name')->first();
+            }else{
+                $found = Term::whereIn('name', $terms)->pluck('name')->first();
+            }
+
+            if(!empty($found)){
+                return '';
+            }
+
+            $slug = SlugService::createSlug(Term::class, 'slug', $term);
+            $options['name'] = $term;
+            $options['slug'] = $slug;
+            try{
+                $created_term = new Term();
+                $created_term->fill($options);
+                $created_term->save();
+
+
+                $created_taxonomy = Taxonomy::firstOrCreate([
+                    'taxonomy' => $taxonomy,
+                    'term_id'  => $created_term->id,
+                    'parent'   => $parent,
+                    'sort'     => $order
+                ]);
+                $this->taxonomies()->attach($created_term->id);
+                return $created_term;
+            }catch (\Exception $e){
+
+            }
+
+        }
+        return '';
+    }
+
+
+    /**
+     * @param  $term
+     * @param  string  $taxonomy
+     * @return mixed
+     */
+    public function getTermBySlug($slug, $taxonomy = ''){
+        if ($taxonomy) {
+            $term_ids = $this->taxonomies->where('taxonomy', $taxonomy)->pluck('term_id');
+        } else {
+            $term_ids = $this->getTaxonomies('term_id');
+        }
+        return Term::whereIn('id', $term_ids)->where('slug', '=', $slug)->first();
+    }
+
+
+    /**
+     * @param $term
+     * @param string $taxonomy
+     * @return mixed
+     */
+    public function removeSingleTerm( $slug, $taxonomy = '' )
+    {
+        if ( $term = $this->getTermBySlug($slug, $taxonomy) ) {
+            if ( $taxonomy ) {
+                $taxonomy = $this->taxonomies->where('taxonomy', $taxonomy)->where('term_id', $term->id)->first();
+                $taxonomy_id = $taxonomy->id;
+                $taxonomy->forceDelete();
+            } else {
+                $taxonomy = $this->taxonomies->where('term_id', $term->id)->first();
+                $taxonomy_id = $taxonomy->id;
+            }
+
+            $term->forceDelete();
+            return $this->taxed()->where('taxonomy_id', $taxonomy_id)->delete();
+        }
+
+        return null;
+    }
+    
 }
