@@ -127,7 +127,7 @@ trait HasTaxonomies
         $request = Request::capture();
         $post = $request->all();
         $page = 1;
-        $actual_link = $_SERVER['SCRIPT_URI'];
+        $actual_link = $this->getActualLink();
         $term = Term::whereIn('id', $term_ids);
         //search
         if(isset($post['search']) && !empty($post['search'])){
@@ -326,7 +326,7 @@ trait HasTaxonomies
             if(array_key_exists('slug',$options)){
                 $found = Term::where('name', $term)->where('slug',$options['slug'])->pluck('name')->first();
             }else{
-                $found = Term::whereIn('name', $terms)->pluck('name')->first();
+                $found = Term::whereIn('name', $term)->pluck('name')->first();
             }
 
             if(!empty($found)){
@@ -396,6 +396,19 @@ trait HasTaxonomies
         }
 
         return null;
+    }
+
+    /**
+     * Return the actual link in browser address bar
+     * @return mixed
+     */
+    public function getActualLink(){
+        if(isset($_SERVER['SCRIPT_URI'])){
+            $url = $_SERVER['SCRIPT_URI'];
+        }elseif (isset($_SERVER['REQUEST_URI'])){
+            $url = $_SERVER['REQUEST_URI'];
+        }
+        return $url;
     }
     
 }
