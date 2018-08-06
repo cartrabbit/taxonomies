@@ -5,8 +5,8 @@
     "require": {
         "php"                 : ">=5.6.4",
         "doctrine/dbal"       : "2.5.x",
-        "illuminate/support"  : ">=5.6.*",
-        "illuminate/database" : ">=5.6.*",
+        "illuminate/support"  : ">=5.6",
+        "illuminate/database" : ">=5.6",
         "cartrabbit/eloquent-sluggable" : "dev-master"
     },
     "require-dev": {
