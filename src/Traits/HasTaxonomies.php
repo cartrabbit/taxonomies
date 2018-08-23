@@ -37,7 +37,7 @@ trait HasTaxonomies
 	 * @param int $parent
 	 * @param int $order
 	 */
-	public function addTerm( $terms, $taxonomy, $parent = 0, $order = 0 )
+	/*public function addTerm( $terms, $taxonomy, $parent = 0, $order = 0 )
 	{
 
 		$terms = TaxableUtils::makeTermsArray($terms);
@@ -59,15 +59,15 @@ trait HasTaxonomies
 		}
 
 		$this->taxonomies()->detach();
-	}
+	}*/
 
 	/**
 	 * @param $taxonomy_id
 	 */
-	public function setCategory( $taxonomy_id )
+	/*public function setCategory( $taxonomy_id )
 	{
 		$this->taxonomies()->attach($taxonomy_id);
-	}
+	}*/
 
 	/**
 	 * @param $terms
@@ -75,40 +75,40 @@ trait HasTaxonomies
 	 * @param int $parent
 	 * @param int $order
 	 */
-	public function createTaxables( $terms, $taxonomy, $parent = 0, $order = 0 )
+	/*public function createTaxables( $terms, $taxonomy, $parent = 0, $order = 0 )
 	{
 		$terms = TaxableUtils::makeTermsArray($terms);
 
 		TaxableUtils::createTerms($terms );
 		TaxableUtils::createTaxonomies($terms, $taxonomy, $parent, $order );
-	}
+	}*/
 
 	/**
 	 * @param string $by
 	 * @return mixed
 	 */
-	public function getTaxonomies($by = 'id')
+	/*public function getTaxonomies($by = 'id')
 	{
 		return $this->taxonomies->pluck($by);
-	}
+	}*/
 
 	/**
 	 * @param  string  $taxonomy
 	 * @return mixed
 	 */
-	public function getTermNames($taxonomy = '')
+	/*public function getTermNames($taxonomy = '')
 	{
 		if ($terms = $this->getTerms($taxonomy))
             $terms->pluck('name');
 
 		return null;
-	}
+	}*/
 
 	/**
      * @param  string  $taxonomy
 	 * @return mixed
 	 */
-	public function getTerms($taxonomy = '')
+	/*public function getTerms($taxonomy = '')
 	{
 		if ($taxonomy) {
 			$term_ids = $this->taxonomies->where('taxonomy', $taxonomy)->pluck('term_id');
@@ -116,14 +116,15 @@ trait HasTaxonomies
 			$term_ids = $this->getTaxonomies('term_id');
 		}
         return Term::whereIn('id', $term_ids)->get();
-	}
+	}*/
 
 	public function getTermsItems($taxonomy = '',$limit=20){
         if ($taxonomy) {
-            $term_ids = $this->taxonomies->where('taxonomy', $taxonomy)->pluck('term_id');
+            $term_ids = Taxonomy::where('taxonomy', $taxonomy)->pluck('term_id');
         } else {
-            $term_ids = $this->getTaxonomies('term_id');
+            $term_ids = Taxonomy::all()->pluck('term_id');
         }
+
         $request = Request::capture();
         $post = $request->all();
         $page = 1;
@@ -145,7 +146,7 @@ trait HasTaxonomies
      * @param  string  $taxonomy
 	 * @return mixed
 	 */
-	public function getTerm($term, $taxonomy = '')
+	/*public function getTerm($term, $taxonomy = '')
 	{
         if ($taxonomy) {
 			$term_ids = $this->taxonomies->where('taxonomy', $taxonomy)->pluck('term_id');
@@ -154,24 +155,24 @@ trait HasTaxonomies
 		}
 
 		return Term::whereIn('id', $term_ids)->where('name', '=', $term)->first();
-	}
+	}*/
 
 	/**
 	 * @param $term
 	 * @param string $taxonomy
 	 * @return bool
 	 */
-	public function hasTerm( $term, $taxonomy = '' )
+	/*public function hasTerm( $term, $taxonomy = '' )
 	{
 		return (bool) $this->getTerm($term, $taxonomy);
-	}
+	}*/
 
 	/**
 	 * @param $term
 	 * @param string $taxonomy
 	 * @return mixed
 	 */
-	public function removeTerm( $term, $taxonomy = '' )
+	/*public function removeTerm( $term, $taxonomy = '' )
 	{
 		if ( $term = $this->getTerm($term, $taxonomy) ) {
 			if ( $taxonomy ) {
@@ -188,15 +189,15 @@ trait HasTaxonomies
 		}
 
 		return null;
-	}
+	}*/
 
 	/**
 	 * @return mixed
 	 */
-	public function removeAllTerms()
+	/*public function removeAllTerms()
 	{
 		return $this->taxed()->delete();
-	}
+	}*/
 
 	/**
 	 * Filter model to subset with the given tags
@@ -206,7 +207,7 @@ trait HasTaxonomies
 	 * @param string $taxonomy
 	 * @return object $query
 	 */
-	public function scopeWithTerms( $query, $terms, $taxonomy )
+	/*public function scopeWithTerms( $query, $terms, $taxonomy )
 	{
 		$terms = TaxableUtils::makeTermsArray($terms);
 
@@ -215,7 +216,7 @@ trait HasTaxonomies
 		}
 
 		return $query;
-	}
+	}*/
 
 	/**
 	 * Filter model to subset with the given tags
@@ -225,7 +226,7 @@ trait HasTaxonomies
 	 * @param string $taxonomy
 	 * @return
 	 */
-	public function scopeWithTax( $query, $term, $taxonomy ) {
+	/*public function scopeWithTax( $query, $term, $taxonomy ) {
 		$term_ids = Taxonomy::where('taxonomy', $taxonomy)->pluck('term_id');
 
 		$term = Term::whereIn('id', $term_ids)->where('name', '=', $term)->first();
@@ -235,36 +236,18 @@ trait HasTaxonomies
 		return $query->whereHas('taxed', function($q) use($term, $taxonomy) {
 			$q->where('taxonomy_id', $taxonomy->id);
 		});
-	}
-
-	/**
-	 * @param $query
-	 * @param $term
-	 * @param $taxonomy
-	 * @return mixed
-	 */
-	public function scopeWithTerm( $query, $term, $taxonomy ) {
-		$term_ids = Taxonomy::where('taxonomy', $taxonomy)->pluck('term_id');
-
-		$term = Term::whereIn('id', $term_ids)->where('name', '=', $term)->first();
-
-		$taxonomy = Taxonomy::where('term_id', $term->id)->first();
-
-		return $query->whereHas('taxonomies', function($q) use($term, $taxonomy) {
-			$q->where('term_id', $term->id);
-		});
-	}
+	}*/
 
 	/**
 	 * @param $query
 	 * @param $taxonomy_id
 	 * @return mixed
 	 */
-	public function scopeHasCategory( $query, $taxonomy_id ) {
+	/*public function scopeHasCategory( $query, $taxonomy_id ) {
 		return $query->whereHas('taxed', function($q) use($taxonomy_id) {
 			$q->where('taxonomy_id', $taxonomy_id);
 		});
-	}
+	}*/
 
     /**
      * @param int $term_id
@@ -288,7 +271,7 @@ trait HasTaxonomies
      * @param array $options
      * @return bool
      */
-    public function updateTerm($id, $taxonomy = '', $options = array())
+    /*public function updateTerm($id, $taxonomy = '', $options = array())
     {
         // load term
         // check option have parent and update taxonomy
@@ -314,19 +297,36 @@ trait HasTaxonomies
             return false;
         }
 
-    }
+    }*/
 
+    public function updateTermByTaxonomy($slug,$taxonomy = '', $options = array()){
+        $term_ids = $this->getTaxonomiesTermIds($taxonomy);
+        $term = Term::whereIn('id', $term_ids)->where('slug',$slug)->first();
+        if($term){
+            if(isset($options['parent'])){
+                Taxonomy::where('term_id',$term->id)->where('taxonomy',$taxonomy)->update(array('parent' => $options['parent']));
+            }
+            if(isset($options['slug']) && $options['slug'] && $term->slug != $options['slug']){
+                // chk slug is unique
+                $options['slug'] = SlugService::createSlug(Term::class, 'slug', $options['slug']);
+            }
+            $term->fill($options);
+            $term->save();
+            return true;
+        }
+        return false;
+    }
 
     public function addSingleTerm($term, $taxonomy, $parent = 0, $order = 0, $options = array()){
         if(empty($taxonomy)){
             return '';
         }
-
+        
         if(!empty($term)){
             if(array_key_exists('slug',$options)){
                 $found = Term::where('name', $term)->where('slug',$options['slug'])->pluck('name')->first();
             }else{
-                $found = Term::whereIn('name', $term)->pluck('name')->first();
+                $found = Term::where('name', $term)->pluck('name')->first();
             }
 
             if(!empty($found)){
@@ -336,6 +336,7 @@ trait HasTaxonomies
             $slug = SlugService::createSlug(Term::class, 'slug', $term);
             $options['name'] = $term;
             $options['slug'] = $slug;
+
             try{
                 $created_term = new Term();
                 $created_term->fill($options);
@@ -348,7 +349,7 @@ trait HasTaxonomies
                     'parent'   => $parent,
                     'sort'     => $order
                 ]);
-                $this->taxonomies()->attach($created_term->id);
+               // $this->taxonomies()->attach($created_term->id);
                 return $created_term;
             }catch (\Exception $e){
 
@@ -365,11 +366,7 @@ trait HasTaxonomies
      * @return mixed
      */
     public function getTermBySlug($slug, $taxonomy = ''){
-        if ($taxonomy) {
-            $term_ids = $this->taxonomies->where('taxonomy', $taxonomy)->pluck('term_id');
-        } else {
-            $term_ids = $this->getTaxonomies('term_id');
-        }
+        $term_ids = $this->getRelationTermIds($taxonomy);
         return Term::whereIn('id', $term_ids)->where('slug', '=', $slug)->first();
     }
 
@@ -379,23 +376,40 @@ trait HasTaxonomies
      * @param string $taxonomy
      * @return mixed
      */
-    public function removeSingleTerm( $slug, $taxonomy = '' )
+    public function removeSingleTerm( $slug, $taxonomy = '' , $force_delete = true )
     {
         if ( $term = $this->getTermBySlug($slug, $taxonomy) ) {
             if ( $taxonomy ) {
                 $taxonomy = $this->taxonomies->where('taxonomy', $taxonomy)->where('term_id', $term->id)->first();
                 $taxonomy_id = $taxonomy->id;
-                $taxonomy->forceDelete();
+                if($force_delete){
+                    $taxonomy->forceDelete();
+                }
             } else {
                 $taxonomy = $this->taxonomies->where('term_id', $term->id)->first();
                 $taxonomy_id = $taxonomy->id;
             }
-
-            $term->forceDelete();
+            if($force_delete){
+                $term->forceDelete();
+            }
             return $this->taxed()->where('taxonomy_id', $taxonomy_id)->delete();
         }
 
         return null;
+    }
+
+    public function getTermsByTaxonomy($taxonomy = ''){
+        $term_ids = $this->getTaxonomiesTermIds($taxonomy);
+        return Term::whereIn('id', $term_ids)->get();
+    }
+
+    public function scopeWithTermSlug($query, $slugs,$taxonomy){
+        return $query->whereHas('taxonomies', function($q) use($slugs,$taxonomy) {
+            $q->where('taxonomy',$taxonomy)
+                ->whereHas('term',function ($q) use($slugs){
+                    $q->whereIn('slug',$slugs);
+                });
+        });
     }
 
     /**
@@ -410,5 +424,27 @@ trait HasTaxonomies
         }
         return $url;
     }
-    
+
+    public function getTermsByRelation($taxonomy = ''){
+        $term_ids = $this->getRelationTermIds($taxonomy);
+        return Term::whereIn('id', $term_ids)->get();
+    }
+
+    public function getRelationTermIds($taxonomy = ''){
+        if ($taxonomy) {
+            $term_ids = $this->taxonomies->where('taxonomy', $taxonomy)->pluck('term_id');
+        } else {
+            $term_ids = $this->getTaxonomies('term_id');
+        }
+        return $term_ids;
+    }
+
+    public function getTaxonomiesTermIds($taxonomy = ''){
+        if ($taxonomy) {
+            $term_ids = Taxonomy::where('taxonomy', $taxonomy)->pluck('term_id');
+        } else {
+            $term_ids = Taxonomy::all()->pluck('term_id');
+        }
+        return $term_ids;
+    }
 }
