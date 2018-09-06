@@ -249,6 +249,7 @@ trait HasTaxonomies
 		});
 	}*/
 
+
     /**
      * @param int $term_id
      * @param string $taxonomy
