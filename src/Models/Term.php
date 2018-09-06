@@ -27,7 +27,7 @@ class Term extends Model
 		'slug',
         'desc',
         'access',
-        'geozone_id'
+        'geozone_slug'
 	];
 
 	/**

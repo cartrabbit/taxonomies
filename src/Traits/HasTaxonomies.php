@@ -254,14 +254,24 @@ trait HasTaxonomies
      * @param string $taxonomy
      * @return mixed
      */
-    public function getTermChildrens($term_id = 0, $taxonomy = '')
+    public function getRelationTermChildrens($term_id = 0, $taxonomy = '')
     {
         if ($taxonomy) {
             $term_ids = $this->taxonomies->where('taxonomy', $taxonomy)->where('parent', $term_id)->pluck('term_id');
         } else {
             $term_ids = $this->taxonomies->where('parent', $term_id)->pluck('term_id');
         }
+        $term_ids = $this->getRelationTermIds($taxonomy);
+        return Term::whereIn('id', $term_ids)->get();
+    }
 
+    public function getTaxonomyTermChildrens($term_id = 0, $taxonomy = '')
+    {
+        if ($taxonomy) {
+            $term_ids = Taxonomy::where('taxonomy', $taxonomy)->where('parent', $term_id)->pluck('term_id');
+        } else {
+            $term_ids = Taxonomy::where('parent', $term_id)->pluck('term_id');
+        }
         return Term::whereIn('id', $term_ids)->get();
     }
 
@@ -370,6 +380,26 @@ trait HasTaxonomies
         return Term::whereIn('id', $term_ids)->where('slug', '=', $slug)->first();
     }
 
+    public function getTaxonomyTermBySlug($slug, $taxonomy = ''){
+        $term_ids = $this->getTaxonomiesTermIds($taxonomy);
+        return Term::whereIn('id', $term_ids)->where('slug', '=', $slug)->first();
+    }
+
+    public function removeTaxonomySingleTerm( $slug, $taxonomy = '' , $force_delete = false )
+    {
+        if ( $term = $this->getTaxonomyTermBySlug($slug, $taxonomy) ) {
+            if ( $taxonomy ) {
+                $taxonomy = Taxonomy::where('taxonomy', $taxonomy)->where('term_id', $term->id)->first();
+                $taxonomy_id = $taxonomy->id;
+                $taxonomy->forceDelete();
+            }
+            $term->forceDelete();
+
+            return true;//$this->taxed()->where('taxonomy_id', $taxonomy_id)->delete();
+        }
+
+        return null;
+    }
 
     /**
      * @param $term
@@ -382,16 +412,12 @@ trait HasTaxonomies
             if ( $taxonomy ) {
                 $taxonomy = $this->taxonomies->where('taxonomy', $taxonomy)->where('term_id', $term->id)->first();
                 $taxonomy_id = $taxonomy->id;
-                if($force_delete){
-                    $taxonomy->forceDelete();
-                }
+                $taxonomy->forceDelete();
             } else {
                 $taxonomy = $this->taxonomies->where('term_id', $term->id)->first();
                 $taxonomy_id = $taxonomy->id;
             }
-            if($force_delete){
-                $term->forceDelete();
-            }
+            $term->forceDelete();
             return $this->taxed()->where('taxonomy_id', $taxonomy_id)->delete();
         }
 
