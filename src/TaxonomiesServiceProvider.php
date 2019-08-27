@@ -13,29 +13,29 @@ class TaxonomiesServiceProvider extends ServiceProvider
      *
      * @return void
      */
-	public function boot()
-	{
+    public function boot()
+    {
         $this->handleConfig();
         $this->handleMigrations();
-	}
+    }
 
     /**
      * Register the service provider.
      *
      * @return void
      */
-	public function register()
-	{
+    public function register()
+    {
 //	    $this->app->singleton(Taxonomies::class);
-	}
+    }
 
-	/**
+    /**
      * @inheritdoc
-	 */
-	public function provides()
-	{
-		return [];
-	}
+     */
+    public function provides()
+    {
+        return [];
+    }
 
     /**
      * Publish and merge the config file
@@ -49,9 +49,7 @@ class TaxonomiesServiceProvider extends ServiceProvider
 //       echo "<pre>";print_r($this->app);exit;
 //        $this->publishes([$configPath => config_path('lecturize.php')]);
 //        $this->publishes([$configPath => '/var/www/cartrabbit_framework/administrator/components/com_joomlarabbit/cartrabbit.config.php']);
-
 //        $this->mergeConfigFrom($configPath, 'cartrabbit');
-
         app('config')->taxonomies([
             /*
              * Terms table
@@ -75,10 +73,9 @@ class TaxonomiesServiceProvider extends ServiceProvider
      */
     private function handleMigrations()
     {
-        foreach ( $this->migrations as $class => $file ) {
-            if ( ! class_exists($class) ) {
+        foreach ($this->migrations as $class => $file) {
+            if (!class_exists($class)) {
                 $timestamp = date('Y_m_d_His', time());
-
 //                $this->publishes([
 //                    __DIR__ .'/../database/migrations/'. $file .'.php.stub' =>
 //                        database_path('migrations/'. $timestamp .'_'. $file .'.php')

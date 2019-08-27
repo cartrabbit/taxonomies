@@ -10,31 +10,31 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Term extends Model
 {
-	use Sluggable;
-	use SoftDeletes;
+    use Sluggable;
+    use SoftDeletes;
 
-	/**
-	 * @inheritdoc
-	 */
-	protected $table = 'terms';
+    /**
+     * @inheritdoc
+     */
+    protected $table = 'terms';
 
-	/**
+    /**
      * @todo make this editable via config file
-	 * @inheritdoc
-	 */
-	protected $fillable = [
-		'name',
-		'slug',
+     * @inheritdoc
+     */
+    protected $fillable = [
+        'name',
+        'slug',
         'desc',
         'access',
         'geozone_slug'
-	];
+    ];
 
-	/**
-	 * @inheritdoc
-	 */
-	protected $dates = [
-	    'deleted_at'
+    /**
+     * @inheritdoc
+     */
+    protected $dates = [
+        'deleted_at'
     ];
 
     /**
@@ -51,89 +51,84 @@ class Term extends Model
         ];
     }
 
-	/**
-	 * @return \Illuminate\Database\Eloquent\Relations\MorphMany
-	 */
-	public function taxable() {
-		return $this->morphMany(Taxable::class, 'taxable');
-	}
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function taxable()
+    {
+        return $this->morphMany(Taxable::class, 'taxable');
+    }
 
-	/**
-	 * @return \Illuminate\Database\Eloquent\Relations\HasMany
-	 */
-	public function taxonomies() {
-		return $this->hasMany(Taxonomy::class);
-	}
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function taxonomies()
+    {
+        return $this->hasMany(Taxonomy::class);
+    }
 
     public function meta()
     {
         return $this->hasMany(TermMeta::class, 'term_id');
     }
 
-	/**
-	 * Get display name.
-	 *
-	 * @param  string $locale
-	 * @param  int    $limit
-	 * @return mixed
-	 */
-	public function getDisplayName($locale = '', $limit = 0)
+    /**
+     * Get display name.
+     *
+     * @param  string $locale
+     * @param  int $limit
+     * @return mixed
+     */
+    public function getDisplayName($locale = '', $limit = 0)
     {
-		$locale = $locale ?: app()->getLocale();
+        $locale = $locale ?: app()->getLocale();
+        switch ($locale) {
+            case 'en' :
+            default :
+                $name = $this->name;
+                break;
+            /*
+                        case 'de' :
+                            $name = $this->name_de;
+                            break;
 
-		switch ($locale) {
-			case 'en' :
-			default :
-				$name = $this->name;
-				break;
-/*
-			case 'de' :
-				$name = $this->name_de;
-				break;
+                        case 'it' :
+                            $name = $this->name_it;
+                            break;
+            */
+        }
+        return $limit > 0 ? str_limit($name, $limit) : $name;
+    }
 
-			case 'it' :
-				$name = $this->name_it;
-				break;
-*/
-		}
-
-		return $limit > 0 ? str_limit($name, $limit) : $name;
-	}
-
-	/**
-	 * Get route parameters.
-	 *
-     * @param  string  $taxonomy
-	 * @return mixed
-	 */
-	public function getRouteParameters($taxonomy)
+    /**
+     * Get route parameters.
+     *
+     * @param  string $taxonomy
+     * @return mixed
+     */
+    public function getRouteParameters($taxonomy)
     {
         $taxonomy = Taxonomy::taxonomy($taxonomy)
-                            ->term($this->name)
-                            ->with('parent')
-                            ->first();
-
+            ->term($this->name)
+            ->with('parent')
+            ->first();
         $parameters = $this->getParentSlugs($taxonomy);
-
         array_push($parameters, $taxonomy->taxonomy);
-
         return array_reverse($parameters);
-	}
+    }
 
     /**
      * Get slugs of parent terms.
      *
-     * @param  Taxonomy  $taxonomy
-     * @param  array     $parameters
+     * @param  Taxonomy $taxonomy
+     * @param  array $parameters
      * @return array
      */
     function getParentSlugs(Taxonomy $taxonomy, $parameters = [])
     {
         array_push($parameters, $taxonomy->term->slug);
-
         if (($parents = $taxonomy->parent()) && ($parent = $parents->first()))
             return $this->getParentSlugs($parent, $parameters);
-
         return $parameters;
     }
 }

@@ -1,5 +1,4 @@
 <?php namespace Cartrabbit\Taxonomies\Traits;
-
 /**
  * Class TaxableTrait
  * @deprecated Use HasTaxonomies instead.
@@ -7,5 +6,5 @@
  */
 trait TaxableTrait
 {
-	use HasTaxonomies;
+    use HasTaxonomies;
 }
