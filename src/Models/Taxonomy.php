@@ -15,7 +15,7 @@ class Taxonomy extends Model
      * @todo make this editable via config file
      * @inheritdoc
      */
-    protected $table = 'taxonomies';
+    protected $table = 'j2storefour_taxonomies';
 
     /**
      * @inheritdoc

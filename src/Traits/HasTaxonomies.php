@@ -28,7 +28,7 @@ trait HasTaxonomies
      */
     public function taxonomies()
     {
-        return $this->morphToMany(Taxonomy::class, 'taxable');
+        return $this->morphToMany(Taxonomy::class, 'taxable', 'j2storefour_taxables');
     }
 
 
@@ -110,7 +110,9 @@ trait HasTaxonomies
             if (!empty($found)) {
                 return '';
             }
+
             $slug = SlugService::createSlug(Term::class, 'slug', $term);
+
             $options['name'] = $term;
             $options['slug'] = $slug;
             try {
@@ -173,7 +175,7 @@ trait HasTaxonomies
     public function removeTaxonomyTaxable($slug, $taxonomy = '')
     {
         $term = $this->getTaxonomyTermBySlug($slug, $taxonomy);
-        $taxable_count = Taxable::from('taxables')->join('taxonomies', 'taxonomies.id', '=', 'taxables.taxonomy_id')->where('taxonomies.term_id', '=', $term->id)->count('taxables.id');
+        $taxable_count = Taxable::from('j2storefour_taxables')->join('j2storefour_taxonomies', 'j2storefour_taxonomies.id', '=', 'j2storefour_taxables.taxonomy_id')->where('j2storefour_taxonomies.term_id', '=', $term->id)->count('j2storefour_taxables.id');
         if ($taxable_count == 0) {
             foreach ($term->meta as $meta) {
                 $meta->delete();

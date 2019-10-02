@@ -16,7 +16,7 @@ class Term extends Model
     /**
      * @inheritdoc
      */
-    protected $table = 'terms';
+    protected $table = 'j2storefour_terms';
 
     /**
      * @todo make this editable via config file

@@ -50,20 +50,15 @@ class TaxonomiesServiceProvider extends ServiceProvider
 //        $this->publishes([$configPath => config_path('lecturize.php')]);
 //        $this->publishes([$configPath => '/var/www/cartrabbit_framework/administrator/components/com_joomlarabbit/cartrabbit.config.php']);
 //        $this->mergeConfigFrom($configPath, 'cartrabbit');
-        app('config')->taxonomies([
-            /*
-             * Terms table
-             */
+
+        /*app('config')->taxonomies([
+            //Terms table
             'table_terms' => 'terms',
-            /*
-             * Taxonomies table
-             */
+            //Taxonomies table
             'table_taxonomies' => 'taxonomies',
-            /*
-             * Relationship table
-             */
+            //Relationship table
             'table_pivot' => 'taxables',
-        ]);
+        ]);*/
     }
 
     /**

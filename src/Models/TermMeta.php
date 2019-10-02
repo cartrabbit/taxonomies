@@ -14,7 +14,7 @@ class TermMeta extends Model
     /**
      * @inheritdoc
      */
-    protected $table = 'termmeta';
+    protected $table = 'j2storefour_termmeta';
     protected $primaryKey = 'meta_id';
     public $timestamps = false;
     /**

@@ -12,7 +12,7 @@ class Taxable extends Model
      * @todo make this editable via config file
      * @inheritdoc
      */
-    protected $table = 'taxables';
+    protected $table = 'j2storefour_taxables';
 
     /**
      * @inheritdoc
